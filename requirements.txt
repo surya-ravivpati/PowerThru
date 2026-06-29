@@ -1,0 +1,30 @@
+# PowerThru — Python dependencies
+#
+# The project currently contains two independent modelling stacks. Most users
+# only need one of them; they are listed together here for convenience.
+#
+# Install with:  pip install -r requirements.txt
+
+# Core scientific stack (used everywhere)
+numpy
+pandas
+scipy
+scikit-learn
+
+# TensorFlow / Keras stack
+#   - train_model.py        (trains the BiLSTM, saves fatigue_bilstm.h5)
+#   - TEST2.py              (loads the BiLSTM for live risk prediction)
+tensorflow
+
+# PyTorch stack
+#   - emg_fatigue_cnn.py        (EMG CNN-LSTM — see note in file header)
+#   - all_v2_loso_normalized.py (WESAD BiLSTM with LOSO cross-validation)
+torch
+
+# Local LLM coaching (TEST2.py). Requires a running Ollama server with the
+# `llama3` model pulled:  https://ollama.com
+ollama
+
+# Training utilities
+tqdm
+joblib

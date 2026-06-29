@@ -25,7 +25,11 @@ import torch.optim as optim
 # CONFIG
 # ------------------------------------------------------------
 
-DATA_ROOT = "/Users/yashravipati/Desktop/PowerThruAI/WESAD/"
+# Override with the WESAD_DATA_ROOT environment variable; falls back to the
+# original development path when unset.
+DATA_ROOT = os.environ.get(
+    "WESAD_DATA_ROOT", "/Users/yashravipati/Desktop/PowerThruAI/WESAD/"
+)
 USE_SUBJECTS = None
 
 # WESAD sampling rates

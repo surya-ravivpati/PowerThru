@@ -3,6 +3,12 @@ EMG Muscle-Fatigue Detection using Deep Learning
 
 This script implements a deep learning approach for detecting muscle fatigue
 from EMG signals using a hybrid CNN-LSTM architecture with attention.
+
+NOTE (not runnable as-is): this module depends on a `svm_freq_baseline` module
+that provides `EMGDataLoader` and `EMGPreprocessor`, and on
+`FrequencyFeatureExtractor` / `PseudoLabelGenerator` which are not defined or
+imported here. Those pieces are not yet present in this repository. The file is
+kept for reference until that preprocessing module is added.
 """
 
 import os

@@ -3,21 +3,17 @@ import random
 import time
 import json
 import os
-import pandas as pd
-import math
-import textwrap
 import numpy as np
-import bleak
-import asyncio
-import os
-import csv
-import tensorflow as tf
-FEATURES = ["emg", "temp", "sweat", "accel_x", "accel_y", "accel_z","accel_mag"]
 
+FEATURES = ["emg", "temp", "sweat", "accel_x", "accel_y", "accel_z", "accel_mag"]
+
+# TensorFlow is optional: if it (or the trained model) is unavailable the demo
+# degrades gracefully to the heuristic fallback_score(). Import it lazily here
+# so a missing TensorFlow install does not crash the whole script.
 try:
     from tensorflow.keras.models import load_model
     MODEL_AVAILABLE = True
-except:
+except Exception:
     MODEL_AVAILABLE = False
 
 MEMORY_FILE = "sensor_memory.json"
@@ -243,7 +239,8 @@ while True:
     if user.strip() == "":
         data = get_sensor_data()
     else:
-        print("Invalid input. Just press Enter to simulate or type 'manual' to input data manually.")    
+        print("Invalid input. Just press Enter to simulate or type 'manual' to input data manually.")
+        continue
 
     score = predict_risk(data)
 
