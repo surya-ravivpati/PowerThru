@@ -1,11 +1,10 @@
-import json
-import time
 import csv
+import time
 import os
 import random
+import math
+
 DATASET_FILE = "cramp_dataset.csv"
-label = -1
-MODE = False
 
 HEADER = [
     "timestamp",
@@ -16,99 +15,88 @@ HEADER = [
     "accel_y",
     "accel_z",
     "accel_mag",
-    "score",
-    "label"
+    "label",
 ]
 
-def calculate_score(emg, temp, sweat, ax, ay, az, am):
-    emg_norm = emg
-    temp_norm = (temp - 36) / 3
-    temp_norm = max(0, min(1, temp_norm))
-    sweat_norm = sweat 
-    accel_norm = am / 3
-    accel_norm = max(0, min(1, accel_norm))
-
-    risk = (
-        0.4 * emg_norm +
-        0.25 * sweat_norm +
-        0.2 * temp_norm +
-        0.15 * accel_norm
-    )
-
-    score = int(risk * 100)
-
-    return score
-
-def score_to_label(score):
-    
-    if score < 60:
-        return 0
-    return 1
-
 if not os.path.exists(DATASET_FILE):
-    with open(DATASET_FILE, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(HEADER)
+    with open(DATASET_FILE, "w", newline = "") as f:
+        csv.writer(f).writerow(HEADER)
 
-while MODE == True:
-    emg = float(input("EMG: "))
-    temp = float(input("Temp: "))
-    sweat = float(input("Sweat: "))
-    ax = float(input("Accel X: "))
-    ay = float(input("Accel Y: "))
-    az = float(input("Accel Z: "))
+#sim state
+emg = 0.3
+temp = 37.0
+sweat = 0.2
+fatigue_state = 0 # 0 = norm, 1 = cramp possibilty
 
-    print("\nLabel:")
-    print("0 = Normal")
-    print("1 = Cramp/Fatigue Event")
+def clamp(x, a, b):
+    return max(a, min(b, x))
 
-    label = int(input("Label: "))
+def update_state():
+    global emg, temp, sweat, fatigue_state
 
-    am = (ax**2 + ay**2 + az**2)**0.5
-
-    with open(DATASET_FILE, "a", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow([
-            time.time(),
-            emg,
-            temp,
-            sweat,
-            ax,
-            ay,
-            az,
-            am,
-            label
-        ])
-    print("Saved.\n")
-else:
-    emg = random.uniform(0,1)
-    temp = random.uniform(36,39)
-    sweat = random.uniform(0,1)
-    ax = random.uniform(-2,2)
-    ay = random.uniform(-2,2)
-    az = random.uniform(-2,2)
-
-    am = (ax**2 + ay**2 + az**2)**0.5
+    #occasional cramp
+    if random.random() < 0.01:
+        fatigue_state = 1
+    elif random.random() < 0.05:
+        fatigue_state = 0
     
-    score = calculate_score(emg,temp,sweat,ax,ay,az,am)
-    label = score_to_label(score)
+    #usual drift
+    emg += random.uniform(-0.02, 0.03)
+    temp += random.uniform(-0.01, 0.02)
+    sweat += random.uniform(-0.02, 0.03)
+
+    #cramp spike behavior
+    if fatigue_state == 1:
+        emg += random.uniform(0.05, 0.15)
+        sweat += random.uniform(0.05, 0.12)
+        temp += random.uniform(0.02, 0.08)
+    
+    emg = clamp(emg, 0, 1)
+    temp = clamp(temp, 35, 40)
+    sweat = clamp(sweat, 0, 1)
+
+def generate_accel():
+    ax = random.uniform(-1,1)
+    ay = random.uniform(-1,1)
+    az = random.uniform(-1,1)
+
+    if fatigue_state == 1:
+        ax += random.uniform(-1,1)
+        ay += random.uniform(-1,1)
+        az += random.uniform(-1,1)
+
+    am = math.sqrt(ax**2 + ay**2 + az**2)
+    return ax,ay,az,am
+
+def label_from_state():
+    return fatigue_state
+
+#data loop 1000s of rows
+
+rows = 0
+TARGET = 40000
+
+while rows < TARGET:
+    update_state()
+    ax, ay, az, am = generate_accel()
+
+    label = label_from_state()
+
     with open(DATASET_FILE, "a", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow([
+        csv.writer(f).writerow([
             time.time(),
-            round(emg,2),
-            round(temp,2),
-            round(sweat,2),
-            round(ax,2),
-            round(ay,2),
-            round(az,2),
-            round(am,2),
-            score,
+            round(emg, 3),
+            round(temp, 3),
+            round(sweat, 3),
+            round(ax, 3),
+            round(ay, 3),
+            round(az, 3),
+            round(am, 3),
             label
-        ])
-    print("Saved.\n")
-    print(f"Score = ", score)
-    print(f"Label =", label)
+        ]) 
+    rows += 1
 
-    time.sleep(0.05)
+    if rows % 1000 == 0:
+        print(f"Generated {rows} rows")   
 
+    time.sleep(0.02)
