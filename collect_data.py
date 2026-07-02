@@ -96,7 +96,7 @@ while rows < TARGET:
         ]) 
     rows += 1
 
-    if rows % 1000 == 0:
+    if rows % 100 == 0:
         print(f"Generated {rows} rows")   
 
     time.sleep(0.02)
