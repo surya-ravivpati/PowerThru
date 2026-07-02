@@ -22,6 +22,7 @@ env/
 *.joblib
 dl_model_out/
 best_model.pth
+outputs/
 
 # Runtime state written by TEST2.py
 sensor_memory.json

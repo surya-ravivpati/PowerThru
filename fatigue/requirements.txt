@@ -1,0 +1,18 @@
+# PowerThru fatigue pipeline dependencies.
+
+# Core (required for preprocessing, features, classical models, evaluation)
+numpy
+scipy
+scikit-learn
+PyYAML
+
+# Deep model (1D-CNN) + training loop
+torch
+
+# Optional
+xgboost          # stronger gradient-boosting baseline (falls back if absent)
+PyWavelets       # wavelet-domain features (features.wavelet)
+matplotlib       # plots / interpretability visualisations
+
+# Dev
+pytest

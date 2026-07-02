@@ -1,0 +1,39 @@
+# Default configuration for the PowerThru fatigue pipeline.
+# Override any subtree; unspecified values fall back to the dataclass defaults
+# in fatigue/config.py (where the reasoning for each default is documented).
+
+data_root: data/raw
+cache_dir: data/processed
+output_dir: outputs
+
+signal:
+  sampling_rate: 1259.0   # Delsys Trigno, from the dataset spec
+  n_channels: 8
+  bandpass_low: 20.0
+  bandpass_high: 450.0
+  bandpass_order: 4
+  notch_freq: 60.0        # set 50.0 for EU recordings
+  notch_q: 30.0
+
+window:
+  window_sec: 0.5
+  overlap: 0.5
+
+features:
+  time_domain: true
+  freq_domain: true
+  wavelet: false
+  nonlinear: false
+
+label:
+  scheme: binary          # {binary, three_class}
+  binary_threshold: 1     # level >= 1 (moderate) counts as fatigued
+
+train:
+  seed: 42
+  batch_size: 64
+  epochs: 100
+  lr: 0.001
+  weight_decay: 0.0001
+  dropout: 0.3
+  early_stopping_patience: 12
